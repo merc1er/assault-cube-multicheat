@@ -15,6 +15,10 @@ class Player:
         pistol_ammo = 0x12C
         grenade_ammo = 0x144
 
+        x_position = 0x28
+        y_position = 0x2C
+        z_position = 0x30
+
     def __init__(self, process) -> None:
         self.process = process
         self.base_address = process.base_address + self.Offsets.local_player
@@ -58,3 +62,12 @@ class Player:
             32,
         )
         self.process.write_int(address, value)
+
+    def set_position(self) -> None:
+        address_x = find_dynamic_address(
+            self.process.process_handle,
+            self.base_address,
+            [self.Offsets.x_position],
+            32,
+        )
+        self.process.write_float(address_x, 150.0)
