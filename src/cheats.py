@@ -19,6 +19,10 @@ class Player:
         y_position = 0x2C
         z_position = 0x30
 
+        x_velocity = 0x10
+        y_velocity = 0x14
+        z_velocity = 0x18
+
     def __init__(self, process) -> None:
         self.process = process
         self.base_address = process.base_address + self.Offsets.local_player
