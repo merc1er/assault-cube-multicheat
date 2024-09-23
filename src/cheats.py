@@ -1,13 +1,20 @@
+import numpy as np
 from memory import find_dynamic_address
 
 
-class Player:
+class GameMemory:
+
     class Offsets:
         local_player = 0x0017E0A8
 
+        # Player status
+        # Type: int
         health = 0xEC
         armor = 0xF0
+        is_alive = 0x76  # 0 = dead, 1 = alive
 
+        # Ammunition
+        # Type: int
         assault_rifle_ammo = 0x140
         submachine_gun_ammo = 0x138
         sniper_ammo = 0x13C
@@ -15,13 +22,27 @@ class Player:
         pistol_ammo = 0x12C
         grenade_ammo = 0x144
 
+        # Position
+        # Type: float
         x_position = 0x28
         y_position = 0x2C
         z_position = 0x30
 
+        # Velocity
+        # Type: float
         x_velocity = 0x10
         y_velocity = 0x14
         z_velocity = 0x18
+
+        # Movement
+        # Type: single byte
+        forward_movement_enabled = 0x74  # 1 = forward, 255 = backwards
+        side_movement_enabled = 0x75  # 1 = left, 255 = right
+
+        # Camera
+        # Type: float
+        x_camera = 0x34
+        y_camera = 0x38
 
     def __init__(self, process) -> None:
         self.process = process
@@ -75,3 +96,65 @@ class Player:
             32,
         )
         self.process.write_float(address_x, 150.0)
+
+    def get_modelview_matrix(self) -> np.ndarray:
+        # Address is static, so we use it directly
+        address = 0x0057DF90
+
+        # Reading 16 floats (4x4 matrix)
+        matrix_values = []
+        for i in range(16):
+            matrix_value = self.process.read_float(
+                address + i * 4
+            )  # 32-bit float, 4 bytes each
+            matrix_values.append(matrix_value)
+
+        # Reshape the list of values into a 4x4 matrix
+        modelview_matrix = np.array(matrix_values).reshape((4, 4))
+        return modelview_matrix
+
+    def get_projection_matrix(self) -> np.ndarray:
+        # Address is static, so we use it directly
+        address = 0x0057DFD0
+
+        # Reading 16 floats (4x4 matrix)
+        matrix_values = []
+        for i in range(16):
+            matrix_value = self.process.read_float(
+                address + i * 4
+            )  # 32-bit float, 4 bytes each
+            matrix_values.append(matrix_value)
+
+        # Reshape the list of values into a 4x4 matrix
+        modelview_matrix = np.array(matrix_values).reshape((4, 4))
+        return modelview_matrix
+
+    def increase_speed(self) -> None:
+        multiplier = 2.0
+
+        x_velocity_address = find_dynamic_address(
+            self.process.process_handle,
+            self.base_address,
+            [self.Offsets.x_velocity],
+            32,
+        )
+        value = self.process.read_float(x_velocity_address)
+        self.process.write_float(x_velocity_address, value * multiplier)
+
+        y_velocity_address = find_dynamic_address(
+            self.process.process_handle,
+            self.base_address,
+            [self.Offsets.y_velocity],
+            32,
+        )
+        value = self.process.read_float(y_velocity_address)
+        self.process.write_float(y_velocity_address, value * multiplier)
+
+        z_velocity_address = find_dynamic_address(
+            self.process.process_handle,
+            self.base_address,
+            [self.Offsets.z_velocity],
+            32,
+        )
+        value = self.process.read_float(z_velocity_address)
+        self.process.write_float(z_velocity_address, value * multiplier)
