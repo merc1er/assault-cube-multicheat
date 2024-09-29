@@ -19,8 +19,16 @@ class GameMemory:
         submachine_gun_ammo = 0x138
         sniper_ammo = 0x13C
         shotgun_ammo = 0x134
+        carabine_ammo = 0x130
         pistol_ammo = 0x12C
         grenade_ammo = 0x144
+
+        # Fire rate
+        # Type: byte
+        carabine_fire_rate = 0x155
+        shotgun_fire_rate = 0x159
+        submachine_fire_rate = 0x15D
+        sniper_fire_rate = 0x161
 
         # Position
         # Type: float
