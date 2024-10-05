@@ -1,16 +1,25 @@
 from pymem import Pymem  # type: ignore
-import numpy as np
+from pymem.exception import ProcessNotFound  # type: ignore
 
 from cheats import GameMemory
 from datatypes import Vec3, Viewport
 from world_to_screen import world_to_screen
 
 
-process = Pymem("ac_client.exe")
+process_name = "ac_client.exe"
+
+try:
+    process = Pymem(process_name)
+except ProcessNotFound:
+    print(f"Process {process_name} not found. Make sure Assault Cube is running.")
+    exit()
+
 player = GameMemory(process)
-player.set_all_ammo(1337)
-player.set_heatlh(1337)
-player.set_armor(1337)
+player.jump_higher()
+
+# player.set_all_ammo(1337)
+# player.set_heatlh(1337)
+# player.set_armor(1337)
 # player.set_position()
 
 
