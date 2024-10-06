@@ -1,7 +1,8 @@
 from pymem import Pymem  # type: ignore
 from pymem.exception import ProcessNotFound  # type: ignore
 
-from cheats import GameMemory
+from game.world import World
+from game.local_player import LocalPlayer
 from datatypes import Vec3, Viewport
 from world_to_screen import world_to_screen
 
@@ -14,8 +15,15 @@ except ProcessNotFound:
     print(f"Process {process_name} not found. Make sure Assault Cube is running.")
     exit()
 
-player = GameMemory(process)
-player.jump_higher()
+player = LocalPlayer(process)
+world = World(process)
+
+while True:
+    selection = input("1: Enable jump hack\n2: Disable jump hack\n")
+    if selection == "1":
+        world.jump_higher()
+    elif selection == "2":
+        world.disable_jump_higher()
 
 # player.set_all_ammo(1337)
 # player.set_heatlh(1337)
