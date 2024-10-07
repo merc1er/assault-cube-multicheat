@@ -1,3 +1,6 @@
+import sys
+
+from PySide6 import QtCore, QtWidgets, QtGui
 from pymem import Pymem  # type: ignore
 from pymem.exception import ProcessNotFound  # type: ignore
 
@@ -18,12 +21,43 @@ except ProcessNotFound:
 player = LocalPlayer(process)
 world = World(process)
 
-while True:
-    selection = input("1: Enable jump hack\n2: Disable jump hack\n")
-    if selection == "1":
-        world.jump_higher()
-    elif selection == "2":
-        world.disable_jump_higher()
+
+class MyWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
+        self.text = QtWidgets.QLabel(
+            "p1nkrat's AssaultCube trainer", alignment=QtCore.Qt.AlignCenter
+        )
+
+        self.layout = QtWidgets.QVBoxLayout(self)
+        self.layout.addWidget(self.text)
+        self.layout.addWidget(self.button)
+
+        self.jump_hack_enabled = False
+        self.button.clicked.connect(self.enable_jump_hack)
+
+    @QtCore.Slot()
+    def enable_jump_hack(self) -> None:
+        if not self.jump_hack_enabled:
+            world.enable_jump_hack()
+            self.jump_hack_enabled = True
+            self.text.setText("Jump hack enabled.")
+        else:
+            world.disable_jump_hack()
+            self.jump_hack_enabled = False
+            self.text.setText("Jump hack disabled.")
+
+
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
+
+    widget = MyWidget()
+    widget.resize(400, 300)
+    widget.show()
+
+    sys.exit(app.exec())
 
 # player.set_all_ammo(1337)
 # player.set_heatlh(1337)

@@ -1,8 +1,4 @@
-import logging
 from pymem import Pymem  # type: ignore
-
-
-logger = logging.getLogger(__name__)
 
 
 class World:
@@ -17,7 +13,7 @@ class World:
         # Jump code
         jump_code_start = 0xC2486
 
-    def jump_higher(self) -> None:
+    def enable_jump_hack(self) -> None:
         address = self.process.base_address + self.Offsets.jump_code_start
         allocated_memory = self.process.allocate(2048)
 
@@ -62,11 +58,8 @@ class World:
         )
         self.process.write_bytes(address, jmp_newmem, len(jmp_newmem))
 
-        logger.info("✅ Jump higher cheat enabled.")
-
-    def disable_jump_higher(self) -> None:
+    def disable_jump_hack(self) -> None:
         address = self.process.base_address + self.Offsets.jump_code_start
         # mov [esi+18],40000000
         original_code = b"\xC7\x46\x18\x00\x00\x00\x40"
         self.process.write_bytes(address, original_code, len(original_code))
-        logger.info("❌ Jump higher cheat disabled.")
