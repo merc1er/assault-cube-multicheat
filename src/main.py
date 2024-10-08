@@ -26,19 +26,25 @@ class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
+        # Set up the window.
         self.setWindowTitle("p1nkrat's AssaultCube trainer")
-
-        self.button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
+        self.layout = QtWidgets.QVBoxLayout(self)
         self.text = QtWidgets.QLabel(
             "p1nkrat's AssaultCube trainer", alignment=QtCore.Qt.AlignCenter
         )
-
-        self.layout = QtWidgets.QVBoxLayout(self)
         self.layout.addWidget(self.text)
-        self.layout.addWidget(self.button)
 
+        # Jump hack.
         self.jump_hack_enabled = False
-        self.button.clicked.connect(self.enable_jump_hack)
+        self.jump_hack_button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
+        self.jump_hack_button.clicked.connect(self.enable_jump_hack)
+        self.layout.addWidget(self.jump_hack_button)
+
+        # God mode.
+        self.god_mode_enabled = False
+        self.god_mode_button = QtWidgets.QPushButton("🦸 Enable God Mode")
+        self.god_mode_button.clicked.connect(self.enable_god_mode)
+        self.layout.addWidget(self.god_mode_button)
 
     @QtCore.Slot()
     def enable_jump_hack(self) -> None:
@@ -50,6 +56,10 @@ class MyWidget(QtWidgets.QWidget):
             world.disable_jump_hack()
             self.jump_hack_enabled = False
             self.text.setText("Jump hack disabled.")
+
+    @QtCore.Slot()
+    def enable_god_mode(self) -> None:
+        pass
 
 
 if __name__ == "__main__":
