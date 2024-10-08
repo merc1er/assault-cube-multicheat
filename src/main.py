@@ -26,6 +26,8 @@ class MyWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle("p1nkrat's AssaultCube trainer")
+
         self.button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
         self.text = QtWidgets.QLabel(
             "p1nkrat's AssaultCube trainer", alignment=QtCore.Qt.AlignCenter
