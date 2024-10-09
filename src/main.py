@@ -28,6 +28,7 @@ class MyWidget(QtWidgets.QWidget):
 
         # Set up the window.
         self.setWindowTitle("p1nkrat's AssaultCube trainer")
+        self.setWindowIcon(QtGui.QIcon("logo.png"))
         self.layout = QtWidgets.QVBoxLayout(self)
         self.text = QtWidgets.QLabel(
             "p1nkrat's AssaultCube trainer", alignment=QtCore.Qt.AlignCenter
