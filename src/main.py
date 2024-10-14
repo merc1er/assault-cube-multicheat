@@ -1,25 +1,25 @@
 import sys
 
+import pyMeow as pm
 from PySide6 import QtCore, QtWidgets, QtGui
-from pymem import Pymem  # type: ignore
-from pymem.exception import ProcessNotFound  # type: ignore
 
 from game.world import World
-from game.local_player import LocalPlayer
-from datatypes import Vec3, Viewport
-from world_to_screen import world_to_screen
+from game.local_player import Entity
 
 
 process_name = "ac_client.exe"
 
 try:
-    process = Pymem(process_name)
-except ProcessNotFound:
+    process = pm.open_process(process_name)
+    base_address = pm.get_module(process, process_name)["base"]
+    print(f"Process found at 0x{base_address:x}.")
+except Exception:
     print(f"Process {process_name} not found. Make sure Assault Cube is running.")
     exit()
 
-player = LocalPlayer(process)
-world = World(process)
+
+player = Entity(process, base_address)
+# world = World(process)
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -35,32 +35,10 @@ class MyWidget(QtWidgets.QWidget):
         )
         self.layout.addWidget(self.text)
 
-        # Jump hack.
-        self.jump_hack_enabled = False
-        self.jump_hack_button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
-        self.jump_hack_button.clicked.connect(self.enable_jump_hack)
-        self.layout.addWidget(self.jump_hack_button)
-
-        # God mode.
-        self.god_mode_enabled = False
-        self.god_mode_button = QtWidgets.QPushButton("🦸 Enable God Mode")
-        self.god_mode_button.clicked.connect(self.enable_god_mode)
-        self.layout.addWidget(self.god_mode_button)
-
-    @QtCore.Slot()
-    def enable_jump_hack(self) -> None:
-        if not self.jump_hack_enabled:
-            world.enable_jump_hack()
-            self.jump_hack_enabled = True
-            self.text.setText("Jump hack enabled.")
-        else:
-            world.disable_jump_hack()
-            self.jump_hack_enabled = False
-            self.text.setText("Jump hack disabled.")
-
-    @QtCore.Slot()
-    def enable_god_mode(self) -> None:
-        pass
+        # Increase ammo.
+        self.increase_ammo_button = QtWidgets.QPushButton("⬆️ Increase ammo")
+        self.increase_ammo_button.clicked.connect(player.set_all_ammo)
+        self.layout.addWidget(self.increase_ammo_button)
 
 
 if __name__ == "__main__":
@@ -71,24 +49,3 @@ if __name__ == "__main__":
     widget.show()
 
     sys.exit(app.exec())
-
-# player.set_all_ammo(1337)
-# player.set_heatlh(1337)
-# player.set_armor(1337)
-# player.set_position()
-
-
-# Convert a 3D coordinate to a 2D screen coordinate.
-# coords = Vec3(63.18, 5.1, 11)
-# modelview_matrix = player.get_modelview_matrix()
-# projection_matrix = player.get_projection_matrix()
-
-# object_2d_coords = world_to_screen(
-#     coords, modelview_matrix, projection_matrix, Viewport(0, 0, 3840, 2160)
-# )
-
-# print("💃🏻💃🏻💃🏻💃🏻")
-# print(object_2d_coords)
-
-# while True:
-#     player.increase_speed()

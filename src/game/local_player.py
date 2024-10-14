@@ -1,8 +1,8 @@
-import numpy as np
+import pyMeow as pm
 from memory import find_dynamic_address
 
 
-class LocalPlayer:
+class Entity:
 
     class Offsets:
         local_player = 0x0017E0A8
@@ -52,9 +52,12 @@ class LocalPlayer:
         x_camera = 0x34
         y_camera = 0x38
 
-    def __init__(self, process) -> None:
+    def __init__(self, process, base_address) -> None:
         self.process = process
-        self.base_address = process.base_address + self.Offsets.local_player
+        self.base_address = base_address
+        self.local_player_address = pm.r_int(
+            process, base_address + self.Offsets.local_player
+        )
 
     def set_ammo(self, ammo_offset: int, value: int) -> None:
         address = find_dynamic_address(
@@ -65,7 +68,7 @@ class LocalPlayer:
         )
         self.process.write_int(address, value)
 
-    def set_all_ammo(self, value: int = 1337) -> None:
+    def set_all_ammo(self) -> None:
         ammo_offsets = [
             self.Offsets.assault_rifle_ammo,
             self.Offsets.submachine_gun_ammo,
@@ -76,93 +79,7 @@ class LocalPlayer:
         ]
 
         for offset in ammo_offsets:
-            self.set_ammo(offset, value)
+            pm.w_int(self.process, self.local_player_address + offset, 1337)
 
     def set_heatlh(self, value: int) -> None:
-        address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.health],
-            32,
-        )
-        self.process.write_int(address, value)
-
-    def set_armor(self, value: int) -> None:
-        address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.armor],
-            32,
-        )
-        self.process.write_int(address, value)
-
-    def set_position(self) -> None:
-        address_x = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.x_position],
-            32,
-        )
-        self.process.write_float(address_x, 150.0)
-
-    def get_modelview_matrix(self) -> np.ndarray:
-        # Address is static, so we use it directly
-        address = 0x0057DF90
-
-        # Reading 16 floats (4x4 matrix)
-        matrix_values = []
-        for i in range(16):
-            matrix_value = self.process.read_float(
-                address + i * 4
-            )  # 32-bit float, 4 bytes each
-            matrix_values.append(matrix_value)
-
-        # Reshape the list of values into a 4x4 matrix
-        modelview_matrix = np.array(matrix_values).reshape((4, 4))
-        return modelview_matrix
-
-    def get_projection_matrix(self) -> np.ndarray:
-        # Address is static, so we use it directly
-        address = 0x0057DFD0
-
-        # Reading 16 floats (4x4 matrix)
-        matrix_values = []
-        for i in range(16):
-            matrix_value = self.process.read_float(
-                address + i * 4
-            )  # 32-bit float, 4 bytes each
-            matrix_values.append(matrix_value)
-
-        # Reshape the list of values into a 4x4 matrix
-        modelview_matrix = np.array(matrix_values).reshape((4, 4))
-        return modelview_matrix
-
-    def increase_speed(self) -> None:
-        multiplier = 2.0
-
-        x_velocity_address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.x_velocity],
-            32,
-        )
-        value = self.process.read_float(x_velocity_address)
-        self.process.write_float(x_velocity_address, value * multiplier)
-
-        y_velocity_address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.y_velocity],
-            32,
-        )
-        value = self.process.read_float(y_velocity_address)
-        self.process.write_float(y_velocity_address, value * multiplier)
-
-        z_velocity_address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [self.Offsets.z_velocity],
-            32,
-        )
-        value = self.process.read_float(z_velocity_address)
-        self.process.write_float(z_velocity_address, value * multiplier)
+        pm.w_int(self.process, self.local_player_address + self.Offsets.health, value)
