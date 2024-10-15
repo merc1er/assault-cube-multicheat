@@ -1,4 +1,7 @@
+import sys
+
 from PySide6 import QtCore, QtWidgets, QtGui
+import pyMeow as pm
 
 from config import process, base_address
 from entity import Entity
@@ -38,6 +41,19 @@ class MyWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.enable_jump_hack_button)
 
 
+class OverlayThread(QtCore.QThread):
+    """
+    Custom thread to run the while loop in the background.
+    """
+
+    def run(self):
+        pm.overlay_init(target="AssaultCube", fps=60, trackTarget=True)
+        while pm.overlay_loop():
+            pm.begin_drawing()
+            pm.draw_fps(10, 10)
+            pm.end_drawing()
+
+
 if __name__ == "__main__":
     app = QtWidgets.QApplication([])
 
@@ -45,4 +61,7 @@ if __name__ == "__main__":
     widget.resize(400, 300)
     widget.show()
 
-    exit(app.exec())
+    overlay_thread = OverlayThread()
+    overlay_thread.start()
+
+    sys.exit(app.exec())
