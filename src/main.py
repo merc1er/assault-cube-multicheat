@@ -1,21 +1,12 @@
-import pyMeow as pm
 from PySide6 import QtCore, QtWidgets, QtGui
 
+from config import process, base_address
 from entity import Entity
-
-
-process_name = "ac_client.exe"
-
-try:
-    process = pm.open_process(process_name)
-    base_address = pm.get_module(process, process_name)["base"]
-    print(f"Process found at 0x{base_address:x}.")
-except Exception:
-    print(f"Process {process_name} not found. Make sure Assault Cube is running.")
-    exit()
+from world import World
 
 
 player = Entity(process, base_address)
+world = World()
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -40,6 +31,11 @@ class MyWidget(QtWidgets.QWidget):
         self.increase_ammo_button = QtWidgets.QPushButton("⬆️ Increase ammo")
         self.increase_ammo_button.clicked.connect(player.set_all_ammo)
         self.layout.addWidget(self.increase_ammo_button)
+
+        # Enable jump hack.
+        self.enable_jump_hack_button = QtWidgets.QPushButton("🦘 Enable jump hack")
+        self.enable_jump_hack_button.clicked.connect(world.enable_jump_hack)
+        self.layout.addWidget(self.enable_jump_hack_button)
 
 
 if __name__ == "__main__":
