@@ -1,10 +1,7 @@
-import sys
-
 import pyMeow as pm
 from PySide6 import QtCore, QtWidgets, QtGui
 
-from game.world import World
-from game.local_player import Entity
+from entity import Entity
 
 
 process_name = "ac_client.exe"
@@ -19,7 +16,6 @@ except Exception:
 
 
 player = Entity(process, base_address)
-# world = World(process)
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -53,4 +49,4 @@ if __name__ == "__main__":
     widget.resize(400, 300)
     widget.show()
 
-    sys.exit(app.exec())
+    exit(app.exec())

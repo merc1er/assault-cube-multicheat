@@ -1,11 +1,10 @@
 import pyMeow as pm
+from pointers import LOCAL_PLAYER
 
 
 class Entity:
 
     class Offsets:
-        local_player = 0x0017E0A8
-
         # Player status
         # Type: int
         health = 0xEC
@@ -54,9 +53,7 @@ class Entity:
     def __init__(self, process, base_address) -> None:
         self.process = process
         self.base_address = base_address
-        self.local_player_address = pm.r_int(
-            process, base_address + self.Offsets.local_player
-        )
+        self.local_player_address = pm.r_int(process, base_address + LOCAL_PLAYER)
 
     def set_all_ammo(self) -> None:
         ammo_offsets = [
