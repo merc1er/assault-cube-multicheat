@@ -35,6 +35,11 @@ class MyWidget(QtWidgets.QWidget):
         )
         self.layout.addWidget(self.text)
 
+        # Increase health.
+        self.increase_health_button = QtWidgets.QPushButton("❤️‍🩹 Increase health")
+        self.increase_health_button.clicked.connect(player.set_heatlh)
+        self.layout.addWidget(self.increase_health_button)
+
         # Increase ammo.
         self.increase_ammo_button = QtWidgets.QPushButton("⬆️ Increase ammo")
         self.increase_ammo_button.clicked.connect(player.set_all_ammo)

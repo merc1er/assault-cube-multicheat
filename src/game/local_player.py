@@ -59,15 +59,6 @@ class Entity:
             process, base_address + self.Offsets.local_player
         )
 
-    def set_ammo(self, ammo_offset: int, value: int) -> None:
-        address = find_dynamic_address(
-            self.process.process_handle,
-            self.base_address,
-            [ammo_offset],
-            32,
-        )
-        self.process.write_int(address, value)
-
     def set_all_ammo(self) -> None:
         ammo_offsets = [
             self.Offsets.assault_rifle_ammo,
@@ -81,5 +72,5 @@ class Entity:
         for offset in ammo_offsets:
             pm.w_int(self.process, self.local_player_address + offset, 1337)
 
-    def set_heatlh(self, value: int) -> None:
-        pm.w_int(self.process, self.local_player_address + self.Offsets.health, value)
+    def set_heatlh(self) -> None:
+        pm.w_int(self.process, self.local_player_address + self.Offsets.health, 1337)
