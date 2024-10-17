@@ -6,9 +6,10 @@ import pyMeow as pm
 from config import process, base_address
 from entity import Entity
 from world import World
+from pointers import ENTITY_LIST, PLAYER_COUNT, VIEW_MATRIX, LOCAL_PLAYER
 
 
-player = Entity(process, base_address)
+player = Entity(process=process, address=pm.r_int(process, base_address + LOCAL_PLAYER))
 world = World()
 
 
@@ -51,6 +52,21 @@ class OverlayThread(QtCore.QThread):
         while pm.overlay_loop():
             pm.begin_drawing()
             pm.draw_fps(10, 10)
+            local_player_team = player.get_team()
+            player_count = pm.r_int(process, base_address + PLAYER_COUNT)
+            if player_count > 1:
+                ent_buffer = pm.r_ints(
+                    process, pm.r_int(process, base_address + ENTITY_LIST), player_count
+                )[1:]
+                v_matrix = pm.r_floats(process, base_address + VIEW_MATRIX, 16)
+                for address in ent_buffer:
+                    try:
+                        ent = Entity(process, address)
+                        if ent.world_to_screen(v_matrix):
+                            ent.draw_box(local_player_team)
+                            ent.draw_name()
+                    except Exception as e:
+                        continue
             pm.end_drawing()
 
 
