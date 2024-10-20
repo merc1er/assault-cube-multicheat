@@ -67,6 +67,7 @@ class OverlayThread(QtCore.QThread):
                             ent.draw_name()
                             ent.draw_health()
                     except Exception as e:
+                        print(e)
                         continue
             pm.end_drawing()
 

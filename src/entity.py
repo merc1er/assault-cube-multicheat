@@ -75,6 +75,8 @@ class Entity:
         self.pos2d = self.fpos2d = None
         self.head = self.width = self.center = None
 
+        self.color = Colors.red if self.team else Colors.blue
+
     def get_team(self) -> int:
         return pm.r_int(self.process, self.address + self.Offsets.team)
 
@@ -106,23 +108,31 @@ class Entity:
             return False
 
     def draw_box(self, local_player_team: int):
-        color = Colors.red
-        if local_player_team == self.team:
-            color = pm.fade_color(Colors.blue, 0.3)
         pm.draw_rectangle(
             posX=self.pos2d["x"] - self.center,
             posY=self.pos2d["y"] - self.center / 2,
             width=self.width,
             height=self.head + self.center / 2,
-            color=pm.fade_color(color, 0.3),
+            color=pm.fade_color(self.color, 0.3),
         )
         pm.draw_rectangle_lines(
             posX=self.pos2d["x"] - self.center,
             posY=self.pos2d["y"] - self.center / 2,
             width=self.width,
             height=self.head + self.center / 2,
-            color=color,
+            color=self.color,
             lineThick=1.2,
+        )
+
+        # Draw head.
+        pm.draw_circle_sector(
+            centerX=self.pos2d["x"],
+            centerY=self.pos2d["y"] - self.center / 2 + 15,
+            radius=self.width / 5,
+            startAngle=0,
+            endAngle=360,
+            segments=0,
+            color=pm.fade_color(self.color, 0.3),
         )
 
     def draw_name(self):
