@@ -1,25 +1,16 @@
 import sys
 
 from PySide6 import QtCore, QtWidgets, QtGui
-from pymem import Pymem  # type: ignore
-from pymem.exception import ProcessNotFound  # type: ignore
+import pyMeow as pm
 
-from game.world import World
-from game.local_player import LocalPlayer
-from datatypes import Vec3, Viewport
-from world_to_screen import world_to_screen
+from config import process, base_address
+from entity import Entity
+from world import World
+from pointers import ENTITY_LIST, PLAYER_COUNT, VIEW_MATRIX, LOCAL_PLAYER
 
 
-process_name = "ac_client.exe"
-
-try:
-    process = Pymem(process_name)
-except ProcessNotFound:
-    print(f"Process {process_name} not found. Make sure Assault Cube is running.")
-    exit()
-
-player = LocalPlayer(process)
-world = World(process)
+player = Entity(process=process, address=pm.r_int(process, base_address + LOCAL_PLAYER))
+world = World()
 
 
 class MyWidget(QtWidgets.QWidget):
@@ -35,32 +26,48 @@ class MyWidget(QtWidgets.QWidget):
         )
         self.layout.addWidget(self.text)
 
-        # Jump hack.
-        self.jump_hack_enabled = False
-        self.jump_hack_button = QtWidgets.QPushButton("🦘 Enable Jump Hack")
-        self.jump_hack_button.clicked.connect(self.enable_jump_hack)
-        self.layout.addWidget(self.jump_hack_button)
+        # Increase health.
+        self.increase_health_button = QtWidgets.QPushButton("❤️‍🩹 Increase health")
+        self.increase_health_button.clicked.connect(player.set_heatlh)
+        self.layout.addWidget(self.increase_health_button)
 
-        # God mode.
-        self.god_mode_enabled = False
-        self.god_mode_button = QtWidgets.QPushButton("🦸 Enable God Mode")
-        self.god_mode_button.clicked.connect(self.enable_god_mode)
-        self.layout.addWidget(self.god_mode_button)
+        # Increase ammo.
+        self.increase_ammo_button = QtWidgets.QPushButton("⬆️ Increase ammo")
+        self.increase_ammo_button.clicked.connect(player.set_all_ammo)
+        self.layout.addWidget(self.increase_ammo_button)
 
-    @QtCore.Slot()
-    def enable_jump_hack(self) -> None:
-        if not self.jump_hack_enabled:
-            world.enable_jump_hack()
-            self.jump_hack_enabled = True
-            self.text.setText("Jump hack enabled.")
-        else:
-            world.disable_jump_hack()
-            self.jump_hack_enabled = False
-            self.text.setText("Jump hack disabled.")
+        # Enable jump hack.
+        self.enable_jump_hack_button = QtWidgets.QPushButton("🦘 Enable jump hack")
+        self.enable_jump_hack_button.clicked.connect(world.enable_jump_hack)
+        self.layout.addWidget(self.enable_jump_hack_button)
 
-    @QtCore.Slot()
-    def enable_god_mode(self) -> None:
-        pass
+
+class OverlayThread(QtCore.QThread):
+    """
+    Custom thread to run the while loop in the background.
+    """
+
+    def run(self):
+        pm.overlay_init(target="AssaultCube", fps=60, trackTarget=True)
+        while pm.overlay_loop():
+            pm.begin_drawing()
+            pm.draw_fps(10, 10)
+            local_player_team = player.get_team()
+            player_count = pm.r_int(process, base_address + PLAYER_COUNT)
+            if player_count > 1:
+                ent_buffer = pm.r_ints(
+                    process, pm.r_int(process, base_address + ENTITY_LIST), player_count
+                )[1:]
+                v_matrix = pm.r_floats(process, base_address + VIEW_MATRIX, 16)
+                for address in ent_buffer:
+                    try:
+                        ent = Entity(process, address)
+                        if ent.world_to_screen(v_matrix):
+                            ent.draw_box(local_player_team)
+                            ent.draw_name()
+                    except Exception as e:
+                        continue
+            pm.end_drawing()
 
 
 if __name__ == "__main__":
@@ -70,25 +77,7 @@ if __name__ == "__main__":
     widget.resize(400, 300)
     widget.show()
 
+    overlay_thread = OverlayThread()
+    overlay_thread.start()
+
     sys.exit(app.exec())
-
-# player.set_all_ammo(1337)
-# player.set_heatlh(1337)
-# player.set_armor(1337)
-# player.set_position()
-
-
-# Convert a 3D coordinate to a 2D screen coordinate.
-# coords = Vec3(63.18, 5.1, 11)
-# modelview_matrix = player.get_modelview_matrix()
-# projection_matrix = player.get_projection_matrix()
-
-# object_2d_coords = world_to_screen(
-#     coords, modelview_matrix, projection_matrix, Viewport(0, 0, 3840, 2160)
-# )
-
-# print("💃🏻💃🏻💃🏻💃🏻")
-# print(object_2d_coords)
-
-# while True:
-#     player.increase_speed()

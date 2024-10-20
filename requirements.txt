@@ -1,4 +1,2 @@
-pymem==1.13.1
-numpy==2.1.2
 pyside6==6.7.3
 nuitka==2.4.8
