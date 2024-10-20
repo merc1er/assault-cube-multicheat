@@ -65,6 +65,7 @@ class OverlayThread(QtCore.QThread):
                         if ent.world_to_screen(v_matrix):
                             ent.draw_box(local_player_team)
                             ent.draw_name()
+                            ent.draw_health()
                     except Exception as e:
                         continue
             pm.end_drawing()

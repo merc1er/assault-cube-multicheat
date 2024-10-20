@@ -4,6 +4,7 @@ import pyMeow as pm
 class Colors:
     blue = pm.get_color("blue")
     red = pm.get_color("red")
+    pink = pm.get_color("pink")
     white = pm.get_color("white")
     black = pm.get_color("black")
 
@@ -125,11 +126,22 @@ class Entity:
         )
 
     def draw_name(self):
-        textSize = pm.measure_text(self.name, 15) / 2
+        text_size = pm.measure_text(self.name, 15) / 2
         pm.draw_text(
             text=self.name,
-            posX=self.pos2d["x"] - textSize,
+            posX=self.pos2d["x"] - text_size,
             posY=self.pos2d["y"],
             fontSize=15,
             color=Colors.white,
+        )
+
+    def draw_health(self):
+        text_size = pm.measure_text(f"{self.health} HP", 22) / 2
+        color = Colors.pink if self.health < 50 else Colors.white
+        pm.draw_text(
+            text=f"{self.health} HP",
+            posX=self.pos2d["x"] - text_size,
+            posY=self.pos2d["y"] + 20,
+            fontSize=22,
+            color=color,
         )
