@@ -41,6 +41,11 @@ class MyWidget(QtWidgets.QWidget):
         self.enable_jump_hack_button.clicked.connect(world.enable_jump_hack)
         self.layout.addWidget(self.enable_jump_hack_button)
 
+        # Set view angles.
+        self.set_view_angles = QtWidgets.QPushButton("Set view angles")
+        self.set_view_angles.clicked.connect(lambda: player.set_view_angles(0, 0))
+        self.layout.addWidget(self.set_view_angles)
+
 
 class OverlayThread(QtCore.QThread):
     """
@@ -63,7 +68,7 @@ class OverlayThread(QtCore.QThread):
                     try:
                         ent = Entity(process, address)
                         if ent.world_to_screen(v_matrix):
-                            ent.draw_box(local_player_team)
+                            ent.draw_box()
                             ent.draw_name()
                             ent.draw_health()
                     except Exception as e:

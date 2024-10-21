@@ -59,8 +59,8 @@ class Entity:
 
         # Camera
         # Type: float
-        x_camera = 0x34
-        y_camera = 0x38
+        pitch = 0x34
+        yaw = 0x38
 
     def __init__(self, process, address: int) -> None:
         self.process = process
@@ -107,7 +107,7 @@ class Entity:
         except:
             return False
 
-    def draw_box(self, local_player_team: int):
+    def draw_box(self):
         pm.draw_rectangle(
             posX=self.pos2d["x"] - self.center,
             posY=self.pos2d["y"] - self.center / 2,
@@ -155,3 +155,7 @@ class Entity:
             fontSize=22,
             color=color,
         )
+
+    def set_view_angles(self, pitch: float, yaw: float) -> None:
+        pm.w_float(self.process, self.address + self.Offsets.pitch, pitch)
+        pm.w_float(self.process, self.address + self.Offsets.yaw, yaw)
