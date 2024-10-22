@@ -39,12 +39,9 @@ class Entity:
         sniper_fire_rate = 0x161
 
         # Position
-        # Type: float
-        x_position = 0x28
-        y_position = 0x2C
-        z_position = 0x30
-        pos = 0x4
-        fpos = 0x28
+        # Type: vec3
+        head_position = 0x4
+        feet_position = 0x28
 
         # Velocity
         # Type: float
@@ -59,8 +56,8 @@ class Entity:
 
         # Camera
         # Type: float
-        pitch = 0x34
-        yaw = 0x38
+        yaw = 0x34
+        pitch = 0x38
 
     def __init__(self, process, address: int) -> None:
         self.process = process
@@ -70,12 +67,15 @@ class Entity:
             raise Exception("Entity is not alive.")
         self.name = pm.r_string(process, address + self.Offsets.name)
         self.team = pm.r_int(process, address + self.Offsets.team)
-        self.pos3d = pm.r_vec3(process, address + self.Offsets.pos)
-        self.fpos3d = pm.r_vec3(process, address + self.Offsets.fpos)
+        self.pos3d = pm.r_vec3(process, address + self.Offsets.head_position)
+        self.feet_pos3d = pm.r_vec3(process, address + self.Offsets.feet_position)
         self.pos2d = self.fpos2d = None
         self.head = self.width = self.center = None
 
         self.color = Colors.red if self.team else Colors.blue
+
+    def is_alive(self) -> bool:
+        return self.health > 0
 
     def get_team(self) -> int:
         return pm.r_int(self.process, self.address + self.Offsets.team)
@@ -99,7 +99,7 @@ class Entity:
     def world_to_screen(self, vm):
         try:
             self.pos2d = pm.world_to_screen(vm, self.pos3d)
-            self.fpos2d = pm.world_to_screen(vm, self.fpos3d)
+            self.fpos2d = pm.world_to_screen(vm, self.feet_pos3d)
             self.head = self.fpos2d["y"] - self.pos2d["y"]
             self.width = self.head / 2
             self.center = self.width / 2

@@ -1,8 +1,10 @@
 import sys
+from venv import logger
 
 from PySide6 import QtCore, QtWidgets, QtGui
 import pyMeow as pm
 
+from aimbot import aimbot
 from config import process, base_address
 from entity import Entity
 from world import World
@@ -43,7 +45,7 @@ class MyWidget(QtWidgets.QWidget):
 
         # Set view angles.
         self.set_view_angles = QtWidgets.QPushButton("Set view angles")
-        self.set_view_angles.clicked.connect(lambda: player.set_view_angles(0, 0))
+        self.set_view_angles.clicked.connect(lambda: player.set_view_angles(90, 0))
         self.layout.addWidget(self.set_view_angles)
 
 
@@ -71,8 +73,10 @@ class OverlayThread(QtCore.QThread):
                             ent.draw_box()
                             ent.draw_name()
                             ent.draw_health()
+                        if pm.mouse_pressed("right") and ent.is_alive():
+                            aimbot(player, ent)
                     except Exception as e:
-                        print(e)
+                        logger.exception(e)
                         continue
             pm.end_drawing()
 
