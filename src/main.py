@@ -4,7 +4,7 @@ from venv import logger
 from PySide6 import QtCore, QtWidgets, QtGui
 import pyMeow as pm
 
-from aimbot import aimbot
+from aimbot import aim_at_enemy
 from config import process, base_address
 from entity import Entity
 from world import World
@@ -59,7 +59,9 @@ class OverlayThread(QtCore.QThread):
         while pm.overlay_loop():
             pm.begin_drawing()
             pm.draw_fps(10, 10)
-            local_player_team = player.get_team()
+            player = Entity(
+                process=process, address=pm.r_int(process, base_address + LOCAL_PLAYER)
+            )
             player_count = pm.r_int(process, base_address + PLAYER_COUNT)
             if player_count > 1:
                 ent_buffer = pm.r_ints(
@@ -74,7 +76,7 @@ class OverlayThread(QtCore.QThread):
                             ent.draw_name()
                             ent.draw_health()
                         if pm.mouse_pressed("right") and ent.is_alive():
-                            aimbot(player, ent)
+                            aim_at_enemy(player, ent)
                     except Exception as e:
                         logger.exception(e)
                         continue
