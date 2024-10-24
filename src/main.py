@@ -59,9 +59,14 @@ class OverlayThread(QtCore.QThread):
         while pm.overlay_loop():
             pm.begin_drawing()
             pm.draw_fps(10, 10)
-            player = Entity(
-                process=process, address=pm.r_int(process, base_address + LOCAL_PLAYER)
-            )
+            try:
+                player = Entity(
+                    process=process,
+                    address=pm.r_int(process, base_address + LOCAL_PLAYER),
+                )
+            except Exception as e:
+                logger.exception(e)
+                continue
             player_count = pm.r_int(process, base_address + PLAYER_COUNT)
             if player_count > 1:
                 ent_buffer = pm.r_ints(

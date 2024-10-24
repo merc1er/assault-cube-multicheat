@@ -156,6 +156,11 @@ class Entity:
             color=color,
         )
 
+    def get_view_angles(self) -> tuple[float, float]:
+        pitch = pm.r_float(self.process, self.address + self.Offsets.pitch)
+        yaw = pm.r_float(self.process, self.address + self.Offsets.yaw)
+        return pitch, yaw
+
     def set_view_angles(self, pitch: float, yaw: float) -> None:
         pm.w_float(self.process, self.address + self.Offsets.pitch, pitch)
         pm.w_float(self.process, self.address + self.Offsets.yaw, yaw)
