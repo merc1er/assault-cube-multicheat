@@ -1,8 +1,10 @@
 import sys
+from venv import logger
 
 from PySide6 import QtCore, QtWidgets, QtGui
 import pyMeow as pm
 
+from aimbot import aim_at_enemy
 from config import process, base_address
 from entity import Entity
 from world import World
@@ -41,6 +43,11 @@ class MyWidget(QtWidgets.QWidget):
         self.enable_jump_hack_button.clicked.connect(world.enable_jump_hack)
         self.layout.addWidget(self.enable_jump_hack_button)
 
+        # Set view angles.
+        self.set_view_angles = QtWidgets.QPushButton("Set view angles")
+        self.set_view_angles.clicked.connect(lambda: player.set_view_angles(90, 0))
+        self.layout.addWidget(self.set_view_angles)
+
 
 class OverlayThread(QtCore.QThread):
     """
@@ -52,7 +59,14 @@ class OverlayThread(QtCore.QThread):
         while pm.overlay_loop():
             pm.begin_drawing()
             pm.draw_fps(10, 10)
-            local_player_team = player.get_team()
+            try:
+                player = Entity(
+                    process=process,
+                    address=pm.r_int(process, base_address + LOCAL_PLAYER),
+                )
+            except Exception as e:
+                logger.exception(e)
+                continue
             player_count = pm.r_int(process, base_address + PLAYER_COUNT)
             if player_count > 1:
                 ent_buffer = pm.r_ints(
@@ -63,9 +77,13 @@ class OverlayThread(QtCore.QThread):
                     try:
                         ent = Entity(process, address)
                         if ent.world_to_screen(v_matrix):
-                            ent.draw_box(local_player_team)
+                            ent.draw_box()
                             ent.draw_name()
+                            ent.draw_health()
+                        if pm.mouse_pressed("right") and ent.is_alive():
+                            aim_at_enemy(player, ent)
                     except Exception as e:
+                        logger.exception(e)
                         continue
             pm.end_drawing()
 

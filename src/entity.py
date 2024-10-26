@@ -4,6 +4,7 @@ import pyMeow as pm
 class Colors:
     blue = pm.get_color("blue")
     red = pm.get_color("red")
+    pink = pm.get_color("pink")
     white = pm.get_color("white")
     black = pm.get_color("black")
 
@@ -38,12 +39,9 @@ class Entity:
         sniper_fire_rate = 0x161
 
         # Position
-        # Type: float
-        x_position = 0x28
-        y_position = 0x2C
-        z_position = 0x30
-        pos = 0x4
-        fpos = 0x28
+        # Type: vec3
+        head_position = 0x4
+        feet_position = 0x28
 
         # Velocity
         # Type: float
@@ -58,8 +56,8 @@ class Entity:
 
         # Camera
         # Type: float
-        x_camera = 0x34
-        y_camera = 0x38
+        yaw = 0x34
+        pitch = 0x38
 
     def __init__(self, process, address: int) -> None:
         self.process = process
@@ -69,10 +67,15 @@ class Entity:
             raise Exception("Entity is not alive.")
         self.name = pm.r_string(process, address + self.Offsets.name)
         self.team = pm.r_int(process, address + self.Offsets.team)
-        self.pos3d = pm.r_vec3(process, address + self.Offsets.pos)
-        self.fpos3d = pm.r_vec3(process, address + self.Offsets.fpos)
+        self.pos3d = pm.r_vec3(process, address + self.Offsets.head_position)
+        self.feet_pos3d = pm.r_vec3(process, address + self.Offsets.feet_position)
         self.pos2d = self.fpos2d = None
         self.head = self.width = self.center = None
+
+        self.color = Colors.red if self.team else Colors.blue
+
+    def is_alive(self) -> bool:
+        return self.health > 0
 
     def get_team(self) -> int:
         return pm.r_int(self.process, self.address + self.Offsets.team)
@@ -96,7 +99,7 @@ class Entity:
     def world_to_screen(self, vm):
         try:
             self.pos2d = pm.world_to_screen(vm, self.pos3d)
-            self.fpos2d = pm.world_to_screen(vm, self.fpos3d)
+            self.fpos2d = pm.world_to_screen(vm, self.feet_pos3d)
             self.head = self.fpos2d["y"] - self.pos2d["y"]
             self.width = self.head / 2
             self.center = self.width / 2
@@ -104,32 +107,60 @@ class Entity:
         except:
             return False
 
-    def draw_box(self, local_player_team: int):
-        color = Colors.red
-        if local_player_team == self.team:
-            color = pm.fade_color(Colors.blue, 0.3)
+    def draw_box(self):
         pm.draw_rectangle(
             posX=self.pos2d["x"] - self.center,
             posY=self.pos2d["y"] - self.center / 2,
             width=self.width,
             height=self.head + self.center / 2,
-            color=pm.fade_color(color, 0.3),
+            color=pm.fade_color(self.color, 0.3),
         )
         pm.draw_rectangle_lines(
             posX=self.pos2d["x"] - self.center,
             posY=self.pos2d["y"] - self.center / 2,
             width=self.width,
             height=self.head + self.center / 2,
-            color=color,
+            color=self.color,
             lineThick=1.2,
         )
 
+        # Draw head.
+        pm.draw_circle_sector(
+            centerX=self.pos2d["x"],
+            centerY=self.pos2d["y"] - self.center / 2 + 15,
+            radius=self.width / 5,
+            startAngle=0,
+            endAngle=360,
+            segments=0,
+            color=pm.fade_color(self.color, 0.3),
+        )
+
     def draw_name(self):
-        textSize = pm.measure_text(self.name, 15) / 2
+        text_size = pm.measure_text(self.name, 15) / 2
         pm.draw_text(
             text=self.name,
-            posX=self.pos2d["x"] - textSize,
+            posX=self.pos2d["x"] - text_size,
             posY=self.pos2d["y"],
             fontSize=15,
             color=Colors.white,
         )
+
+    def draw_health(self):
+        text_size = pm.measure_text(f"{self.health} HP", 22) / 2
+        color = Colors.pink if self.health < 50 else Colors.white
+        pm.draw_text(
+            text=f"{self.health} HP",
+            posX=self.pos2d["x"] - text_size,
+            posY=self.pos2d["y"] + 20,
+            fontSize=22,
+            color=color,
+        )
+
+    def get_view_angles(self) -> tuple[float, float]:
+        pitch = pm.r_float(self.process, self.address + self.Offsets.pitch)
+        yaw = pm.r_float(self.process, self.address + self.Offsets.yaw)
+        return pitch, yaw
+
+    def set_view_angles(self, pitch: float, yaw: float) -> None:
+        pm.w_float(self.process, self.address + self.Offsets.pitch, pitch)
+        pm.w_float(self.process, self.address + self.Offsets.yaw, yaw)
