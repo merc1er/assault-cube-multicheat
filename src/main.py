@@ -5,6 +5,7 @@ from aimbot import aim_at_enemy
 from config import process, base_address
 from entity import Entity
 from world import World
+from menu import Menu
 from pointers import ENTITY_LIST, PLAYER_COUNT, VIEW_MATRIX, LOCAL_PLAYER
 
 
@@ -17,9 +18,11 @@ world = World()
 
 def run() -> None:
     pm.overlay_init(target="AssaultCube", fps=60, trackTarget=True)
+    menu = Menu()
     while pm.overlay_loop():
         pm.begin_drawing()
         pm.draw_fps(10, 10)
+        menu.draw()
         try:
             player = Entity(
                 process=process,
