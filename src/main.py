@@ -39,14 +39,22 @@ class MyWidget(QtWidgets.QWidget):
         self.layout.addWidget(self.increase_ammo_button)
 
         # Enable jump hack.
-        self.enable_jump_hack_button = QtWidgets.QPushButton("🦘 Enable jump hack")
-        self.enable_jump_hack_button.clicked.connect(world.enable_jump_hack)
-        self.layout.addWidget(self.enable_jump_hack_button)
+        self.jump_hack_button = QtWidgets.QPushButton("🦘 Enable jump hack")
+        self.jump_hack_button.clicked.connect(self.toggle_jump_hack)
+        self.layout.addWidget(self.jump_hack_button)
 
         # Set view angles.
         self.set_view_angles = QtWidgets.QPushButton("Set view angles")
         self.set_view_angles.clicked.connect(lambda: player.set_view_angles(90, 0))
         self.layout.addWidget(self.set_view_angles)
+
+    def toggle_jump_hack(self) -> None:
+        if self.jump_hack_button.text() == "🦘 Enable jump hack":
+            self.jump_hack_button.setText("🦘 Disable jump hack")
+            world.enable_jump_hack()
+        else:
+            self.jump_hack_button.setText("🦘 Enable jump hack")
+            world.disable_jump_hack()
 
 
 class OverlayThread(QtCore.QThread):
