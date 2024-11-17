@@ -1,18 +1,15 @@
 <div align="center">
-    <h2>Assault Cube Multicheat</h2>
-    <p>A trainer for Assault Cube written in Python.</p>
+  <img src="logo.jpg" alt="Logo" width="200">
+  <h2>Assault Cube Multicheat</h2>
+  <p>A trainer for Assault Cube written in Python.</p>
 </div>
 
 ## Features
 
-- Jump higher
-- God mode
-
-## Assault Cube matrices
-
-1. mvmatrix
-2. projmatrix
-3. mvpmatrix
+- [x] ESP
+- [x] Aimbot (experimental)
+- [x] Jump higher
+- [ ] God mode
 
 ## Building
 
