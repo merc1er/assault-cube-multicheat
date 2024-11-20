@@ -28,5 +28,13 @@ Then, build the project with:
 
 The first time, make sure to say yes to [Nuitka]'s prompts to install its dependencies.
 
+## Developing
+
+Follow the same steps as building, but instead of running the build script, run Python:
+
+```powershell
+python .\src\main.py
+```
+
 [pyMeow]: https://github.com/qb-0/PyMeow?tab=readme-ov-file#floppy_disk-installation
 [Nuitka]: https://nuitka.net/
