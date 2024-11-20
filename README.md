@@ -13,7 +13,8 @@
 
 ## Building
 
-With Python 3.11+ installed on Windows, install the dependencies with:
+With Python 3.11+ installed on Windows, install [pyMeow], then install the dependencies
+with:
 
 ```powershell
 pip install -r requirements.txt
@@ -25,5 +26,7 @@ Then, build the project with:
 .\scripts\build.ps1
 ```
 
-The first time, make sure to say yes to [Nuitka](https://nuitka.net/)'s prompts to
-install its dependencies.
+The first time, make sure to say yes to [Nuitka]'s prompts to install its dependencies.
+
+[pyMeow]: https://github.com/qb-0/PyMeow?tab=readme-ov-file#floppy_disk-installation
+[Nuitka]: https://nuitka.net/
