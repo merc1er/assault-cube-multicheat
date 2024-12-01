@@ -1,7 +1,7 @@
 <div align="center">
   <img src="logo.jpg" alt="Logo" width="200">
-  <h2>Assault Cube Multicheat</h2>
-  <p>A trainer for Assault Cube written in Python.</p>
+  <h2>AssaultCube Multicheat</h2>
+  <p>A trainer for AssaultCube written in Python.</p>
 </div>
 
 ## Features
