@@ -1,5 +1,4 @@
 import pyMeow as pm
-from config import process, base_address
 
 
 class World:
@@ -7,13 +6,17 @@ class World:
     Represents the game world, including physics.
     """
 
+    def __init__(self, process: int, base_address: int):
+        self.process = process
+        self.base_address = base_address
+
     class Offsets:
         # Jump code
         jump_code_start = 0xC2486
 
     def enable_jump_hack(self) -> None:
-        address = base_address + self.Offsets.jump_code_start
-        allocated_memory = pm.allocate_memory(process, 2048)
+        address = self.base_address + self.Offsets.jump_code_start
+        allocated_memory = pm.allocate_memory(self.process, 2048)
 
         # The assembly instructions translated to their hex equivalent.
         # This will mov [esi + 18], 40A00000 (which is 5 in float) and then jump to the
@@ -43,7 +46,7 @@ class World:
         new_code[-4:] = return_address.to_bytes(4, byteorder="little", signed=True)
 
         # Write the new code to the allocated memory
-        pm.w_bytes(process, allocated_memory, bytes(new_code))
+        pm.w_bytes(self.process, allocated_memory, bytes(new_code))
 
         # Patch the original code at "ac_client.exe" + C2486 to jump to the allocated
         # memory
@@ -54,10 +57,10 @@ class World:
             )
             + b"\x90\x90"
         )
-        pm.w_bytes(process, address, jmp_newmem)
+        pm.w_bytes(self.process, address, jmp_newmem)
 
     def disable_jump_hack(self) -> None:
-        address = base_address + self.Offsets.jump_code_start
+        address = self.base_address + self.Offsets.jump_code_start
         # mov [esi+18],40000000
         original_code = b"\xC7\x46\x18\x00\x00\x00\x40"
-        pm.w_bytes(process, address, original_code)
+        pm.w_bytes(self.process, address, original_code)
