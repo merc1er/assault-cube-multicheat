@@ -4,10 +4,11 @@ from PySide6 import QtCore, QtWidgets, QtGui
 import pyMeow as pm
 
 from aimbot import aim_at_enemy
-from config import process_name, check_process
+from config import check_process
 from entity import Entity
 from world import World
 from pointers import ENTITY_LIST, PLAYER_COUNT, VIEW_MATRIX, LOCAL_PLAYER
+
 
 logger = logging.getLogger(__name__)
 player = None
