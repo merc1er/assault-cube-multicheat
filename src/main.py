@@ -27,7 +27,7 @@ class MyWidget(QtWidgets.QWidget):
 
         # Status message.
         self.status_label = QtWidgets.QLabel(
-            "Assault Cube not found. Make sure it is running.",
+            "AssaultCube not found. Make sure it is running.",
             alignment=QtCore.Qt.AlignCenter,
         )
         self.layout.addWidget(self.status_label)
