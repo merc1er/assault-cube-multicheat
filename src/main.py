@@ -75,6 +75,10 @@ class MyWidget(QtWidgets.QWidget):
             self.increase_ammo_button.show()
             self.jump_hack_button.show()
 
+            # Start the overlay thread.
+            overlay_thread = OverlayThread()
+            overlay_thread.start()
+
     def toggle_jump_hack(self) -> None:
         if self.jump_hack_button.text() == "🦘 Enable jump hack":
             self.jump_hack_button.setText("🦘 Disable jump hack")
@@ -128,8 +132,5 @@ if __name__ == "__main__":
     widget = MyWidget()
     widget.resize(300, 150)
     widget.show()
-
-    overlay_thread = OverlayThread()
-    overlay_thread.start()
 
     sys.exit(app.exec())
