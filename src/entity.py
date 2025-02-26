@@ -93,7 +93,7 @@ class Entity:
         for offset in ammo_offsets:
             pm.w_int(self.process, self.address + offset, 1337)
 
-    def set_heatlh(self) -> None:
+    def set_health(self) -> None:
         pm.w_int(self.process, self.address + self.Offsets.health, 1337)
 
     def world_to_screen(self, vm):
