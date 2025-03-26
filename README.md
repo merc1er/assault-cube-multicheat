@@ -17,6 +17,7 @@ With Python 3.11+ installed on Windows, install [pyMeow], then install the depen
 with:
 
 ```powershell
+pip install .\pyMeow-1.73.42.zip
 pip install -r requirements.txt
 ```
 
