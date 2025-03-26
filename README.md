@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="logo.jpg" alt="Logo" width="200">
   <h2>Assault Cube Multicheat</h2>
   <p>A trainer for Assault Cube written in Python.</p>
 </div>
@@ -11,10 +10,11 @@
 - [x] Jump higher
 - [ ] God mode
 
+![Screenshot](docs/esp_and_menu.png)
+
 ## Building
 
-With Python 3.11+ installed on Windows, install [pyMeow], then install the dependencies
-with:
+With Python 3.11+ installed on Windows, install the dependencies with:
 
 ```powershell
 pip install .\pyMeow-1.73.42.zip
